@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VIVI · Acceso</title>
+  <style>
+    :root {
+      --bg: #0e1016; --surface: #171a23; --surface2: #1f2331;
+      --border: #2a2f42; --accent: #6c63ff; --accent-h: #8880ff;
+      --text: #e8eaf0; --text2: #9ca3c0; --text3: #5a607a;
+      --danger: #ff4757; --success: #2ed573; --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh; display: flex; align-items: center;
+      justify-content: center; padding: 20px;
+    }
+    .login-wrap { width: 100%; max-width: 380px; }
+    .logo { text-align: center; margin-bottom: 36px; }
+    .logo-mark {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 60px; height: 60px;
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      border-radius: 16px; font-size: 28px; margin-bottom: 14px;
+      box-shadow: 0 8px 32px rgba(108,99,255,.35);
+    }
+    .logo h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+    .logo p  { font-size: 13px; color: var(--text3); margin-top: 4px; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 32px 28px;
+    }
+    .field { margin-bottom: 18px; }
+    .field label {
+      display: block; font-size: 12px; font-weight: 600; color: var(--text2);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 7px;
+    }
+    .field input {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 11px 14px; color: var(--text);
+      font-size: 14px; outline: none; transition: border-color .2s;
+    }
+    .field input:focus { border-color: var(--accent); }
+    .field input::placeholder { color: var(--text3); }
+    .btn {
+      width: 100%; border: none; border-radius: 8px; padding: 12px;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      transition: background .2s, transform .1s; margin-top: 6px;
+    }
+    .btn:active { transform: scale(.98); }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: var(--accent-h); }
+    .btn-secondary {
+      background: transparent; color: var(--text2);
+      border: 1px solid var(--border); margin-top: 10px;
+    }
+    .btn-secondary:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+    .msg {
+      display: none; border-radius: 8px; font-size: 13px;
+      padding: 10px 13px; margin-top: 14px; text-align: center;
+    }
+    .msg.show { display: block; }
+    .msg.error { background: rgba(255,71,87,.12); border: 1px solid rgba(255,71,87,.3); color: var(--danger); }
+    .msg.ok    { background: rgba(46,213,115,.12); border: 1px solid rgba(46,213,115,.3); color: var(--success); }
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,.3); border-top-color: #fff;
+      border-radius: 50%; animation: spin .7s linear infinite;
+      vertical-align: middle; margin-right: 6px;
+    }
+    .spinner.dark { border-color: rgba(108,99,255,.3); border-top-color: var(--accent); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .divider { text-align: center; color: var(--text3); font-size: 12px; margin: 18px 0 4px; }
+    .footer { text-align: center; margin-top: 20px; font-size: 11px; color: var(--text3); }
+
+    /* Panel de registro (oculto por defecto) */
+    #panelRegistro { display: none; }
+    #panelLogin    { display: block; }
+  </style>
+</head>
+<body>
+
+<div class="login-wrap">
+  <div class="logo">
+    <div class="logo-mark">🏨</div>
+    <h1>VIVI · Viajero</h1>
+    <p>Cierre diario · Cartagena</p>
+  </div>
+
+  <!-- ── LOGIN ── -->
+  <div class="card" id="panelLogin">
+    <div class="field">
+      <label for="lUser">Usuario</label>
+      <input type="text" id="lUser" placeholder="tu usuario" autocomplete="username" autocapitalize="none">
+    </div>
+    <div class="field">
+      <label for="lPass">Contraseña</label>
+      <input type="password" id="lPass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn btn-primary" id="btnLogin">Entrar</button>
+    <div class="msg error" id="errLogin">Usuario o contraseña incorrectos.</div>
+    <div class="divider">¿No tienes cuenta?</div>
+    <button class="btn btn-secondary" id="btnIrRegistro">Crear cuenta nueva</button>
+  </div>
+
+  <!-- ── REGISTRO ── -->
+  <div class="card" id="panelRegistro">
+    <div class="field">
+      <label for="rUser">Elige tu usuario</label>
+      <input type="text" id="rUser" placeholder="sin espacios, sin mayúsculas" autocapitalize="none">
+    </div>
+    <div class="field">
+      <label for="rPass">Contraseña</label>
+      <input type="password" id="rPass" placeholder="mínimo 6 caracteres">
+    </div>
+    <div class="field">
+      <label for="rPass2">Confirmar contraseña</label>
+      <input type="password" id="rPass2" placeholder="repite la contraseña">
+    </div>
+    <button class="btn btn-primary" id="btnRegistrar">Crear cuenta</button>
+    <div class="msg error" id="errRegistro"></div>
+    <div class="msg ok"    id="okRegistro"></div>
+    <div class="divider">¿Ya tienes cuenta?</div>
+    <button class="btn btn-secondary" id="btnIrLogin">Volver al login</button>
+  </div>
+
+  <div class="footer">Viajero Cartagena · uso interno</div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+  firebase.initializeApp({
+    apiKey:            "AIzaSyCMUTxAGOWhd6ePuIau3lf2ej3GimKOn6Q",
+    authDomain:        "viviauditoria-3cd85.firebaseapp.com",
+    projectId:         "viviauditoria-3cd85",
+    storageBucket:     "viviauditoria-3cd85.firebasestorage.app",
+    messagingSenderId: "898766317299",
+    appId:             "1:898766317299:web:4ef8e529bdb50ba8d87986"
+  });
+  const db = firebase.firestore();
+
+  async function sha256(str) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  // ── Elementos ────────────────────────────────────────────────────────
+  const panelLogin    = document.getElementById('panelLogin');
+  const panelRegistro = document.getElementById('panelRegistro');
+
+  const lUser  = document.getElementById('lUser');
+  const lPass  = document.getElementById('lPass');
+  const errLogin = document.getElementById('errLogin');
+  const btnLogin = document.getElementById('btnLogin');
+
+  const rUser  = document.getElementById('rUser');
+  const rPass  = document.getElementById('rPass');
+  const rPass2 = document.getElementById('rPass2');
+  const errReg = document.getElementById('errRegistro');
+  const okReg  = document.getElementById('okRegistro');
+  const btnReg = document.getElementById('btnRegistrar');
+
+  // ── Navegación entre paneles ─────────────────────────────────────────
+  document.getElementById('btnIrRegistro').addEventListener('click', () => {
+    panelLogin.style.display    = 'none';
+    panelRegistro.style.display = 'block';
+    rUser.focus();
+  });
+  document.getElementById('btnIrLogin').addEventListener('click', () => {
+    panelRegistro.style.display = 'none';
+    panelLogin.style.display    = 'block';
+    lUser.focus();
+  });
+
+  // ── LOGIN ────────────────────────────────────────────────────────────
+  async function intentarLogin() {
+    const usuario = lUser.value.trim().toLowerCase();
+    const clave   = lPass.value;
+    if (!usuario || !clave) return;
+
+    btnLogin.disabled = true;
+    btnLogin.innerHTML = '<span class="spinner"></span>Verificando…';
+    errLogin.classList.remove('show');
+
+    try {
+      const hash = await sha256(clave);
+      const doc  = await db.collection('usuarios').doc(usuario).get();
+      if (doc.exists && doc.data().hash === hash) {
+        sessionStorage.setItem('vivi_user', usuario);
+        sessionStorage.setItem('vivi_ts',   Date.now());
+        window.location.href = 'VIVI.html';
+      } else {
+        throw new Error('credenciales incorrectas');
+      }
+    } catch (_) {
+      errLogin.classList.add('show');
+      btnLogin.disabled = false;
+      btnLogin.textContent = 'Entrar';
+      lPass.value = '';
+      lPass.focus();
+    }
+  }
+
+  btnLogin.addEventListener('click', intentarLogin);
+  lPass.addEventListener('keydown', e => { if (e.key === 'Enter') intentarLogin(); });
+  lUser.addEventListener('keydown', e => { if (e.key === 'Enter') lPass.focus(); });
+
+  // ── REGISTRO ─────────────────────────────────────────────────────────
+  async function intentarRegistro() {
+    errReg.classList.remove('show');
+    okReg.classList.remove('show');
+
+    const usuario = rUser.value.trim().toLowerCase().replace(/\s+/g, '');
+    const clave   = rPass.value;
+    const clave2  = rPass2.value;
+
+    if (!usuario) { mostrarErr('Elige un nombre de usuario.'); return; }
+    if (usuario.length < 3) { mostrarErr('El usuario debe tener al menos 3 caracteres.'); return; }
+    if (clave.length < 6)   { mostrarErr('La contraseña debe tener al menos 6 caracteres.'); return; }
+    if (clave !== clave2)   { mostrarErr('Las contraseñas no coinciden.'); return; }
+
+    btnReg.disabled = true;
+    btnReg.innerHTML = '<span class="spinner"></span>Creando cuenta…';
+
+    try {
+      const docRef = db.collection('usuarios').doc(usuario);
+      const existe = await docRef.get();
+      if (existe.exists) { mostrarErr('Ese usuario ya está en uso, elige otro.'); return; }
+
+      const hash = await sha256(clave);
+      await docRef.set({ hash, rol: 'usuario', creadoEn: Date.now() });
+
+      okReg.textContent = '¡Cuenta creada! Ya puedes iniciar sesión.';
+      okReg.classList.add('show');
+      btnReg.textContent = 'Crear cuenta';
+      btnReg.disabled = false;
+
+      // Redirigir al login tras 1.5s
+      setTimeout(() => {
+        rUser.value = ''; rPass.value = ''; rPass2.value = '';
+        panelRegistro.style.display = 'none';
+        panelLogin.style.display    = 'block';
+        lUser.value = usuario;
+        lPass.focus();
+      }, 1500);
+
+    } catch (e) {
+      mostrarErr('Error al crear la cuenta. Intenta de nuevo.');
+      btnReg.textContent = 'Crear cuenta';
+      btnReg.disabled = false;
+    }
+  }
+
+  function mostrarErr(msg) {
+    errReg.textContent = msg;
+    errReg.classList.add('show');
+    btnReg.textContent = 'Crear cuenta';
+    btnReg.disabled = false;
+  }
+
+  btnReg.addEventListener('click', intentarRegistro);
+  rPass2.addEventListener('keydown', e => { if (e.key === 'Enter') intentarRegistro(); });
+  rUser.addEventListener('keydown',  e => { if (e.key === 'Enter') rPass.focus(); });
+  rPass.addEventListener('keydown',  e => { if (e.key === 'Enter') rPass2.focus(); });
+</script>
+</body>
+</html>
